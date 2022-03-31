@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table class="table table-dark">
+    <thead>
+    <tr>
+        <th scope="col">Ticker</th>
+        <th scope="col">Price:</th>
+        <th scope="col">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for ticker in tickers.items %}
+        {% if get_price(ticker.ticker)[ticker.ticker]['USD'] %}
+            <tr>
+                <td>{{ ticker.ticker }}</td>
+                <td>{{ {{ get_price(ticker.ticker)[ticker.ticker]['USD'] }} }}</td>
+                <td>Buy Sell</td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+    </tbody>
+</table>
+<nav class="nav justify-content-center" aria-label="...">
+    <ul class="pagination">
+        {% for page in tickers.iter_pages() %}
+
+            {% if page %}
+                <li class="page-item"><a class="page-link"
+                                         href="{{ url_for('pagination', page_number=page) }}">{{ page }}</a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="">...</a></li>
+            {% endif %}
+
+        {% endfor %}
+    </ul>
+</nav>
+</body>
+</html>
