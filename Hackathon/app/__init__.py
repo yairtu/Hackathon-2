@@ -1,6 +1,8 @@
+import jinja2
 from flask import Flask
 import flask_migrate
 import flask_sqlalchemy
+from jinja2 import filters
 
 from app.config import Config
 

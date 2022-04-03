@@ -8,6 +8,10 @@
             <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
             {{ login_form.username(class="form-control", placeholder="Username") }}
             {{ login_form.password(class="form-control", id="inputPassword", placeholder="Password") }}
+            <div>
+                {{ login_form.remember }}
+                {{ login_form.remember.label }}
+            </div>
             {{ login_form.login(class="btn btn-lg btn-primary btn-block") }}
             <p class="mt-5 mb-3 text-muted">No account? <a href="{{ url_for('register') }}">Sign up</a></p>
         </form>
