@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
     <div class="container">
-        <h1>All Cryptocurrencies</h1>
+        <h1>Top Trending Cryptos</h1>
         <table class="table">
             <thead>
             <tr>
@@ -11,10 +11,10 @@
             </tr>
             </thead>
             <tbody>
-            {% for key, value in ticker_dict.items() %}}
+            {% for key, value in trending.items() %}}
                 <tr>
-                    <td>{{ key }}</td>
-                    <td>${{ value }}</td>
+                    <td>{{ value }}</td>
+                    <td>${{ get_price(key) }}</td>
                     <td><a href="{{ url_for('buy', ticker=key) }}">Buy</a> <a href="{{ url_for('sell', ticker=key) }}">Sell</a>
                     </td>
                 </tr>

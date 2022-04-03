@@ -12,13 +12,11 @@
     </thead>
     <tbody>
     {% for ticker in tickers.items %}
-        {% if get_price(ticker.ticker)[ticker.ticker]['USD'] %}
             <tr>
                 <td>{{ ticker.ticker }}</td>
-                <td>{{ get_price(ticker.ticker)[ticker.ticker]['USD'] }}</td>
-                <td>Buy Sell</td>
+                <td>${{ get_price(ticker.cg_ticker_id) }}</td>
+                <td><a href="{{ url_for('buy', ticker=ticker.ticker) }}">Buy</a> <a href="{{ url_for('sell', ticker=ticker.ticker) }}">Sell</a></td>
             </tr>
-        {% endif %}
     {% endfor %}
     </tbody>
 </table>

@@ -2,38 +2,52 @@ import cryptocompare
 import json
 from app.models import Crypto
 from app import db
+from pycoingecko import CoinGeckoAPI
+import time
 
-# print(cryptocompare.get_price('AEGIS'))
+cg = CoinGeckoAPI()
 
 
-# print(cryptocompare.get_coin_list())
+def get_price(ticker_id):
+	return cg.get_price(ids=ticker_id, vs_currencies='usd')
 
-print(type(cryptocompare.get_price('ETHPR')))
 
-file = 'static/cryptocurrencies.json'
+def get_trending():
+	trending_dict = {}
+	trending = cg.get_search_trending()
+	for coin in trending['coins']:
+		trending_dict[coin['item']['id']] = coin['item']['symbol']
+	return trending_dict
 
-# with open(file, 'w+') as f:
-# 	json.dump(cryptocompare.get_coin_list(), f, indent=4)
+# print(get_price('vempire-ddao'))
 
 # crypto_list = []
 #
+# file = 'static/cryptocurrencies.json'
+#
+# with open(file, 'w+') as f:
+# 	json.dump(cg.get_coins_list(), f, indent=4)
+#
 # with open(file, 'r') as f:
 # 	data = json.load(f)
-# 	for v in data.values():
-# 		crypto_list.append(v['Symbol'])
-
-# for e in crypto_list:
-# 	new_crypto = Crypto(ticker=e)
-# 	db.session.add(new_crypto)
+# 	for e in data:
+# 		new_crypto = Crypto(ticker=e['symbol'], cg_ticker_id=e['id'], name=e['name'])
+# 		db.session.add(new_crypto)
 #
 # db.session.commit()
 
-# print(crypto_list)
+# print(get_price("0x-wormhole")['0x-wormhole'].get('usd'))
+
+# cg.get_coin_by_id(id='0cash')
+# if get_price(e['id'])[e['id']].get('usd') is None:
+# 	continue
+# else:
+
+
+# all_tickers = Crypto.query.all()
 #
-# def load_data():
-# 	with open('./static/cryptocurrencies.json', 'r') as f:
-# 		crypto = json.load(f)
-# 	return crypto
-
-
-# print(load_data())
+# for ticker in all_tickers:
+# 	market_cap = get_price(ticker.cg_ticker_id)[ticker.cg_ticker_id].get('usd_market_cap')
+# 	ticker.market_cap = market_cap
+# 	db.session.commit()
+# 	time.sleep(.01)
