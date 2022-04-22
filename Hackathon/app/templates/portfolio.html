@@ -1,4 +1,32 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>{{ current_user.username }}'s Portfolio</h1>
+    <div class="container">
+        <h1>{{ current_user.username }}'s Portfolio</h1>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Ticker</th>
+                <th scope="col">Price:</th>
+                <th scope="col">Holding Amount:</th>
+                <th scope="col">Current Holding Value (USD):</th>
+                <th scope="col">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in portfolio %}
+
+                <tr>
+                    <td>{{ item['ticker'] }}</td>
+                    <td>{{ item['price'] }}</td>
+                    <td>{{ item['holding_amount'] }}</td>
+                    <td>{{ item['current_holding_value'] }}</td>
+                    <td><a href="{{ url_for('buy', ticker=item['ticker']) }}">Buy</a> <a
+                            href="{{ url_for('sell', ticker=item['ticker']) }}">Sell</a></td>
+                </tr>
+
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 {% endblock %}

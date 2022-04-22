@@ -1,9 +1,9 @@
-from app.models import Crypto, User
+from app.models import Crypto, User, Trade, Portfolio
 from app import flask_app, db, bcrypt
 from app.crypto_data import get_price, get_trending
 from flask import render_template, url_for, redirect, flash, request
-from app.forms import Search, Login, Register
-from flask_login import login_user, current_user, logout_user
+from app.forms import Login, Register, BuyForm, SellForm
+from flask_login import login_user, current_user, logout_user, login_required
 
 
 @flask_app.route('/', methods=['GET', 'POST'])
@@ -28,7 +28,7 @@ def searched():
 		for ticker in all_tickers:
 			if q.lower() == ticker.ticker.lower():
 				ticker_list.append(ticker.cg_ticker_id)
-				price = get_price(ticker.cg_ticker_id)[ticker.cg_ticker_id].get('usd')
+				price = get_price(ticker.cg_ticker_id)
 				if price is not None:
 					ticker_dict[ticker.ticker] = price
 	return render_template('searched.html', all_tickers=all_tickers, ticker_dict=ticker_dict)
@@ -41,18 +41,94 @@ def trending():
 
 
 @flask_app.route('/buy/<ticker>', methods=['GET', 'POST'])
+@login_required
 def buy(ticker):
-	return render_template('buy.html', ticker=ticker)
+	form = BuyForm()
+	crypto = Crypto.query.filter_by(ticker=ticker).first()
+	current_usd = current_user.usd
+	price = float(get_price(crypto.cg_ticker_id))
+	holding_amount = current_holding_amount(crypto.id)
+	holding_value = value(price=price, quantity=holding_amount)
+	max_buy_amount = current_usd / price
+	if form.validate_on_submit():
+		if max_buy_amount < form.amount.data:
+			flash(f"You cannot exceed the maximum buy amount", "danger")
+			return redirect(url_for('buy', ticker=ticker))
+		else:
+			trade = Trade(quantity=form.amount.data, current_price=price, crypto=crypto, user=current_user, buy=True)
+			user_portfolio = current_user.portfolio
+			for item in user_portfolio:
+				if int(item.crypto_id) == crypto.id:
+					item.quantity += trade.quantity
+					db.session.add(trade)
+					db.session.commit()
+					return redirect(url_for('portfolio'))
+			portfolio = Portfolio(crypto_id=crypto.id, ticker=crypto.ticker,
+								  quantity=form.amount.data, user_portfolio=current_user)
+			db.session.add(portfolio)
+			db.session.commit()
+			current_user.usd = current_user.usd - (price * form.amount.data)
+			db.session.add(trade)
+			db.session.commit()
+			return redirect(url_for('portfolio'))
+	return render_template('buy.html', crypto=crypto, value=holding_value, holding=holding_amount,
+						   max_buy_amount=max_buy_amount, form=form, price=price)
 
 
 @flask_app.route('/sell/<ticker>', methods=['GET', 'POST'])
+@login_required
 def sell(ticker):
-	return render_template('sell.html', ticker=ticker)
+	form = SellForm()
+	crypto = Crypto.query.filter_by(ticker=ticker).first()
+	price = float(get_price(crypto.cg_ticker_id))
+	holding_amount = current_holding_amount(crypto.id)
+	holding_value = value(price=price, quantity=holding_amount)
+	if form.validate_on_submit():
+		if holding_amount < form.amount.data:
+			flash(f"Your sell amount cannot exceed your holding quantity", "danger")
+			return redirect(url_for('sell', ticker=ticker))
+		else:
+			trade = Trade(quantity=form.amount.data, current_price=price, crypto=crypto, user=current_user, buy=False)
+			current_user.usd += price * form.amount.data
+			user_portfolio = current_user.portfolio
+			for item in user_portfolio:
+				if int(item.crypto_id) == crypto.id:
+					item.quantity -= trade.quantity
+			db.session.add(trade)
+			db.session.commit()
+			return redirect(url_for('portfolio'))
+	return render_template('sell.html', crypto=crypto, value=holding_value, holding=holding_amount,
+						   form=form, price=price)
 
 
 @flask_app.route('/portfolio')
+@login_required
 def portfolio():
-	return render_template('portfolio.html')
+	# portfolio_data = []
+	# trades = current_user.trades
+	# for trade in trades:
+	# 	if trade.buy:
+	# 		crypto = Crypto.query.filter_by(id=trade.crypto_id).first()
+	# 		portfolio_data.append(
+	# 			{'ticker': crypto.ticker,
+	# 			 'price': get_price(crypto.cg_ticker_id),
+	# 			 'holding_amount': trade.quantity,
+	# 			 'current_holding_value': value(price=float(get_price(crypto.cg_ticker_id)), quantity=trade.quantity)
+	# 			 }
+	# 		)
+	clean_portfolio_data = []
+	portfolio = current_user.portfolio
+	print(portfolio)
+	for item in portfolio:
+		crypto = Crypto.query.filter_by(id=item.crypto_id).first()
+		clean_portfolio_data.append(
+			{'ticker': crypto.ticker,
+			 'price': get_price(crypto.cg_ticker_id),
+			 'holding_amount': item.quantity,
+			 'current_holding_value': value(price=float(get_price(crypto.cg_ticker_id)), quantity=item.quantity)
+			 }
+		)
+	return render_template('portfolio.html', portfolio=clean_portfolio_data)
 
 
 @flask_app.route('/register', methods=['GET', 'POST'])
@@ -81,7 +157,8 @@ def login():
 		user = User.query.filter_by(username=login_form.username.data).first()
 		if user and bcrypt.check_password_hash(user.password, login_form.password.data):
 			login_user(user, remember=login_form.remember.data)
-			return redirect(url_for('home'))
+			redir_page = request.args.get('next')
+			return redirect(redir_page) if redir_page else redirect(url_for('home'))
 		else:
 			flash('Login Unsuccessful. Please check your credentials')
 	return render_template('login.html', login_form=login_form)
@@ -91,3 +168,15 @@ def login():
 def logout():
 	logout_user()
 	return redirect(url_for('home'))
+
+
+def current_holding_amount(crypto_id):
+	user_portfolio = current_user.portfolio
+	for item in user_portfolio:
+		if int(item.crypto_id) == crypto_id:
+			return item.quantity
+	return 0
+
+
+def value(price: float, quantity: float):
+	return price * quantity

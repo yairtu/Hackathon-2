@@ -9,7 +9,12 @@ cg = CoinGeckoAPI()
 
 
 def get_price(ticker_id):
-	return cg.get_price(ids=ticker_id, vs_currencies='usd')
+	try:
+		price = cg.get_price(ticker_id, vs_currencies='usd')[ticker_id].get('usd')
+		f_price = f"{price:.12f}"
+		return f_price
+	except KeyError and TypeError:
+		return 'No price available for this coin'
 
 
 def get_trending():
@@ -51,3 +56,8 @@ def get_trending():
 # 	ticker.market_cap = market_cap
 # 	db.session.commit()
 # 	time.sleep(.01)
+# num = get_price('0x-wormhole')['0x-wormhole']['usd']
+# output = f"{num:.12f}"
+# print(get_price('0x-wormhole'))
+#
+# print(type(get_price('0x-wormhole')['0x-wormhole']['usd']))

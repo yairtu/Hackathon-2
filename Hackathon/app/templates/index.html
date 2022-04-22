@@ -1,37 +1,41 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container">
-    <h1>All Cryptocurrencies</h1>
-  <table class="table">
-    <thead>
-    <tr>
-        <th scope="col">Ticker</th>
-        <th scope="col">Current Price:</th>
-        <th scope="col">Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for ticker in tickers.items %}
+    <div class="container">
+        <h1>All Cryptocurrencies</h1>
+        <table class="table">
+            <thead>
             <tr>
-                <td>{{ ticker.ticker }}</td>
-                <td>${{ get_price(ticker.cg_ticker_id) }}</td>
-                <td><a href="{{ url_for('buy', ticker=ticker.ticker) }}">Buy</a> <a href="{{ url_for('sell', ticker=ticker.ticker) }}">Sell</a></td>
+                <th scope="col">Ticker</th>
+                <th scope="col">Current Price:</th>
+                <th scope="col">Actions</th>
             </tr>
-    {% endfor %}
-    </tbody>
-</table>
-    <nav class="nav justify-content-center" aria-label="...">
-        <ul class="pagination">
-            {% for page in tickers.iter_pages() %}
-
-                {% if page %}
-                    <li class="page-item"><a class="page-link"
-                                             href="{{ url_for('pagination', page_number=page) }}">{{ page }}</a></li>
-                {% else %}
-                    <li class="page-item"><a class="page-link" href="">...</a></li>
+            </thead>
+            <tbody>
+            {% for ticker in tickers.items %}
+                {% if get_price(ticker.cg_ticker_id) != 'No price available for this coin' %}
+                    <tr>
+                        <td>{{ ticker.ticker }}</td>
+                        <td>${{ get_price(ticker.cg_ticker_id) }}</td>
+                        <td><a href="{{ url_for('buy', ticker=ticker.ticker) }}">Buy</a> <a
+                                href="{{ url_for('sell', ticker=ticker.ticker) }}">Sell</a></td>
+                    </tr>
                 {% endif %}
             {% endfor %}
-        </ul>
-    </nav>
-</div>
+            </tbody>
+        </table>
+        <nav class="nav justify-content-center" aria-label="...">
+            <ul class="pagination">
+                {% for page in tickers.iter_pages() %}
+
+                    {% if page %}
+                        <li class="page-item"><a class="page-link"
+                                                 href="{{ url_for('pagination', page_number=page) }}">{{ page }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="">...</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
 {% endblock %}
