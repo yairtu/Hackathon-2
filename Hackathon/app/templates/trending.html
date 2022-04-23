@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
+{% block css %}href="{{ url_for('static', filename='style.css') }}"{% endblock %}
 {% block content %}
-    <div class="container">
-        <h1>Top Trending Cryptos</h1>
-        <table class="table">
+    <div class="container text-center">
+        <h1 class="mb-3-">Top Trending Cryptos</h1>
+        <table class="table table-dark table-striped">
             <thead>
             <tr>
                 <th scope="col">Ticker</th>
@@ -11,11 +12,13 @@
             </tr>
             </thead>
             <tbody>
-            {% for key, value in trending.items() %}}
+            {% for key, value in trending.items() %}
                 <tr>
                     <td>{{ value }}</td>
                     <td>${{ get_price(key) }}</td>
-                    <td><a href="{{ url_for('buy', ticker=key) }}">Buy</a> <a href="{{ url_for('sell', ticker=key) }}">Sell</a>
+                    <td>
+                        <a class="btn btn-outline-info" href="{{ url_for('buy', ticker=key) }}">Buy</a>
+                        <a class="btn btn-outline-danger" href="{{ url_for('sell', ticker=key) }}">Sell</a>
                     </td>
                 </tr>
             {% endfor %}

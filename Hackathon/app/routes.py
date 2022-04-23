@@ -6,13 +6,13 @@ from app.forms import Login, Register, BuyForm, SellForm
 from flask_login import login_user, current_user, logout_user, login_required
 
 
-@flask_app.route('/', methods=['GET', 'POST'])
-def home():
+@flask_app.route('/crypto', methods=['GET', 'POST'])
+def crypto():
 	all_tickers = Crypto.query.paginate(page=1, per_page=10, error_out=False)
 	return render_template('index.html', tickers=all_tickers)
 
 
-@flask_app.route('/page/<int:page_number>', methods=['GET', 'POST'])
+@flask_app.route('/crypto/page/<int:page_number>', methods=['GET', 'POST'])
 def pagination(page_number):
 	all_tickers = Crypto.query.paginate(page=page_number, per_page=10, error_out=False)
 	return render_template('index.html', tickers=all_tickers)
@@ -104,31 +104,23 @@ def sell(ticker):
 @flask_app.route('/portfolio')
 @login_required
 def portfolio():
-	# portfolio_data = []
-	# trades = current_user.trades
-	# for trade in trades:
-	# 	if trade.buy:
-	# 		crypto = Crypto.query.filter_by(id=trade.crypto_id).first()
-	# 		portfolio_data.append(
-	# 			{'ticker': crypto.ticker,
-	# 			 'price': get_price(crypto.cg_ticker_id),
-	# 			 'holding_amount': trade.quantity,
-	# 			 'current_holding_value': value(price=float(get_price(crypto.cg_ticker_id)), quantity=trade.quantity)
-	# 			 }
-	# 		)
-	clean_portfolio_data = []
+	portfolio_data = []
 	portfolio = current_user.portfolio
-	print(portfolio)
+	total_holding_value = 0
 	for item in portfolio:
 		crypto = Crypto.query.filter_by(id=item.crypto_id).first()
-		clean_portfolio_data.append(
+		price = get_price(crypto.cg_ticker_id)
+		current_holding_value = value(price=float(price), quantity=item.quantity)
+		portfolio_data.append(
 			{'ticker': crypto.ticker,
-			 'price': get_price(crypto.cg_ticker_id),
+			 'price': price,
 			 'holding_amount': item.quantity,
-			 'current_holding_value': value(price=float(get_price(crypto.cg_ticker_id)), quantity=item.quantity)
+			 'current_holding_value': current_holding_value
 			 }
 		)
-	return render_template('portfolio.html', portfolio=clean_portfolio_data)
+		total_holding_value += current_holding_value
+	percent_change = (total_holding_value + current_user.usd - 10000) / 100
+	return render_template('portfolio.html', portfolio=portfolio_data, percent_change=percent_change)
 
 
 @flask_app.route('/register', methods=['GET', 'POST'])
@@ -160,7 +152,7 @@ def login():
 			redir_page = request.args.get('next')
 			return redirect(redir_page) if redir_page else redirect(url_for('home'))
 		else:
-			flash('Login Unsuccessful. Please check your credentials')
+			flash('Login Unsuccessful. Please check your credentials', 'danger')
 	return render_template('login.html', login_form=login_form)
 
 
@@ -168,6 +160,12 @@ def login():
 def logout():
 	logout_user()
 	return redirect(url_for('home'))
+
+
+@flask_app.route('/')
+@flask_app.route('/start_trading')
+def home():
+	return render_template('start_trading.html')
 
 
 def current_holding_amount(crypto_id):

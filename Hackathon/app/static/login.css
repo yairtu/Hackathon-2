@@ -1,20 +1,22 @@
 html,
 body {
   height: 100%;
+    background: #16222A; /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #3A6073, #16222A); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #3A6073, #16222A); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+
+.fa {
+    color: white
 }
 
 .loginpage {
-  display: -ms-flexbox;
-  display: -webkit-box;
+  margin-top: 7%;
+  margin-left: 25%;
+  width: 50%;
   display: flex;
-  -ms-flex-align: center;
-  -ms-flex-pack: center;
-  -webkit-box-align: center;
-  align-items: center;
-  -webkit-box-pack: center;
-  justify-content: center;
-  padding-top: 40px;
-  padding-bottom: 40px;
+   align-items: center;
   background-color: #f5f5f5;
 }
 

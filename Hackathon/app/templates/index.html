@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
+{% block css %}href="{{ url_for('static', filename='style.css') }}"{% endblock %}
 {% block content %}
-    <div class="container">
-        <h1>All Cryptocurrencies</h1>
-        <table class="table">
+    <div class="container mt-5 text-center">
+        <h1 class="mb-3">All Cryptocurrencies</h1>
+        <table class="table table-dark table-striped">
             <thead>
             <tr>
                 <th scope="col">Ticker</th>
@@ -16,8 +17,8 @@
                     <tr>
                         <td>{{ ticker.ticker }}</td>
                         <td>${{ get_price(ticker.cg_ticker_id) }}</td>
-                        <td><a href="{{ url_for('buy', ticker=ticker.ticker) }}">Buy</a> <a
-                                href="{{ url_for('sell', ticker=ticker.ticker) }}">Sell</a></td>
+                        <td><a class="btn btn-outline-info" href="{{ url_for('buy', ticker=ticker.ticker) }}">Buy</a>
+                            <a class="btn btn-outline-danger" href="{{ url_for('sell', ticker=ticker.ticker) }}">Sell</a></td>
                     </tr>
                 {% endif %}
             {% endfor %}
@@ -28,11 +29,11 @@
                 {% for page in tickers.iter_pages() %}
 
                     {% if page %}
-                        <li class="page-item"><a class="page-link"
+                        <li class="btn btn-outline-info mb-4"><a class=""
                                                  href="{{ url_for('pagination', page_number=page) }}">{{ page }}</a>
                         </li>
                     {% else %}
-                        <li class="page-item"><a class="page-link" href="">...</a></li>
+                        <li class="btn btn-outline-info mb-4"><a class="" href="">...</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>

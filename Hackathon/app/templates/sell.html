@@ -4,19 +4,24 @@
 
         <h1>{{ crypto.ticker }} - USD</h1>
         <br>
-        <div class="card text-center">
+        <div class="card bg-dark text-center">
             <div class="card-body">
                 <p>Price: {{ price }}</p>
                 <p>Current holding amount: {{ holding }} </p>
                 <p>Value: {{ value }}</p>
                 <p>USD: {{ current_user.usd }}</p>
             </div>
-            <div class="card-footer text-muted">
+            <div class="card-footer flex text-center">
                 <p>Amount to sell:</p>
-                <form action="" method="POST">
+                <form class="justify-content-center row g-3" action="" method="POST">
                     {{ form.hidden_tag() }}
-                    {{ form.amount }}
-                    {{ form.submit }}
+                    <div class="col-auto">
+                        {{ form.amount(class="form-control") }}
+                    </div>
+                    <div class="col-auto">
+                        {{ form.submit(class="btn btn-outline-info") }}
+                    </div>
+
                 </form>
             </div>
         </div>
