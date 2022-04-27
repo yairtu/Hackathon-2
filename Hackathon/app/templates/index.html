@@ -17,8 +17,8 @@
                     <tr>
                         <td>{{ ticker.ticker }}</td>
                         <td>${{ get_price(ticker.cg_ticker_id) }}</td>
-                        <td><a class="btn btn-outline-info" href="{{ url_for('buy', ticker=ticker.ticker) }}">Buy</a>
-                            <a class="btn btn-outline-danger" href="{{ url_for('sell', ticker=ticker.ticker) }}">Sell</a></td>
+                        <td><a class="btn btn-outline-info" href="{{ url_for('main.buy', ticker=ticker.ticker) }}">Buy</a>
+                            <a class="btn btn-outline-danger" href="{{ url_for('main.sell', ticker=ticker.ticker) }}">Sell</a></td>
                     </tr>
                 {% endif %}
             {% endfor %}
@@ -30,7 +30,7 @@
 
                     {% if page %}
                         <li class="btn btn-outline-info mb-4"><a class=""
-                                                 href="{{ url_for('pagination', page_number=page) }}">{{ page }}</a>
+                                                 href="{{ url_for('main.pagination', page_number=page) }}">{{ page }}</a>
                         </li>
                     {% else %}
                         <li class="btn btn-outline-info mb-4"><a class="" href="">...</a></li>

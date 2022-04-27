@@ -17,8 +17,8 @@
                     <td>{{ value }}</td>
                     <td>${{ get_price(key) }}</td>
                     <td>
-                        <a class="btn btn-outline-info" href="{{ url_for('buy', ticker=key) }}">Buy</a>
-                        <a class="btn btn-outline-danger" href="{{ url_for('sell', ticker=key) }}">Sell</a>
+                        <a class="btn btn-outline-info" href="{{ url_for('main.buy', ticker=key) }}">Buy</a>
+                        <a class="btn btn-outline-danger" href="{{ url_for('main.sell', ticker=key) }}">Sell</a>
                     </td>
                 </tr>
             {% endfor %}

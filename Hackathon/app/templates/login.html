@@ -14,7 +14,7 @@
                 {{ login_form.remember.label }}
             </div>
             {{ login_form.login(class="btn btn-outline-primary btn-md mt-2") }}
-            <p class="mt-5 mb-3 text-muted">No account? <a href="{{ url_for('register') }}">Sign up</a></p>
+            <p class="mt-5 mb-3 text-muted">No account? <a href="{{ url_for('user.register') }}">Sign up</a></p>
         </form>
     </div>
 {% endblock %}

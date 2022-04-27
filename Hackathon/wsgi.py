@@ -1,5 +1,7 @@
-from app import flask_app
+from app import create_app, db
 
 if __name__ == '__main__':
-	flask_app.run(port=5252, debug=True)
+	app = create_app()
+	db.create_all(app=app)
+	app.run(port=5252, debug=True)
 
